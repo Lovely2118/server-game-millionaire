@@ -4,7 +4,7 @@ from tests.test_utils import setup  # type: ignore
 
 user_response_correct = {"user_id": "test_user_id",
                          "name_block": "level_1",
-                         "number_question_in_block": 2,
+                         "number_question_in_block": 1,
                          "answer_id": 3}
 
 user_response_with_invalid_block_name = {"user_id": "test_user_id",
@@ -58,7 +58,7 @@ def test_check_answer_user_with_invalid_block_name(setup) -> None:
                                              data=json.dumps(user_response_with_invalid_block_name))
 
     # Тестирование результатов
-    assert response_check_answer_user.status_code == 200
+    assert response_check_answer_user.status_code == 422
     assert response_check_answer_user.json() == {"status": "error", "answer": "There is no block with this name"}
 
 
@@ -78,7 +78,7 @@ def test_check_answer_user_with_incorrect_question_number_in_block(setup) -> Non
                                              data=json.dumps(user_response_with_incorrect_question_number_in_block))
 
     # Тестирование результатов
-    assert response_check_answer_user.status_code == 200
+    assert response_check_answer_user.status_code == 422
     assert response_check_answer_user.json() == {"status": "error", "answer": "There is no such id in the block"}
 
 
