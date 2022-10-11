@@ -1,45 +1,73 @@
-from fastapi import FastAPI
-from fastapi import Request, status
-from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+import random
 
-from app.core import get_quiz
+from fastapi import FastAPI
+from fastapi import Request
+from fastapi.exceptions import RequestValidationError
+
+from app.core.utils import get_quiz, get_json_response, check_entry_in_list
 from app.schemes.quiz import Block
-from app.schemes.request_schemas import UserResponse
+from app.schemes.request_schemas import CheckAnswerResponse, ExcludeTwoAnswersResponse
 
 fast_app = FastAPI()
 
 
 @fast_app.post("/check_answer_user")
-async def check_answer_user(user_response: UserResponse):
+async def check_answer_user(user_response: CheckAnswerResponse):
     quiz = get_quiz()
 
     # Валидация данных
-    # Проверка попадания в списки
+    # Проверка верного названия блока
     try:
         level: list['Block'] = getattr(quiz, user_response.name_block)
     except AttributeError:
-        return {"status": "error", "answer": "There is no block with this name"}
-    if (0 <= user_response.number_question_in_block < len(level)) is False:
-        return {"status": "error", "answer": "There is no such id in the block"}
+        return get_json_response("There is no block with this name")
+
+    # Проверка попадания в списки
+    if check_entry_in_list(user_response.number_question_in_block, level) is False:
+        return get_json_response("There is no such id in the block")
 
     # Проверка корректности id ответа
     answer_id = user_response.answer_id
-    if (0 <= answer_id < 4) is False:
-        return {"status": "error", "answer": "Invalid response number"}
-
     block = level[user_response.number_question_in_block]
+    if check_entry_in_list(answer_id, block.answers) is False:
+        return get_json_response("Invalid response number")
+
+    # Проверяем верность ответа
     right_answer = block.right_answer
     response = right_answer == user_response.answer_id
 
     return {"status": "success", "answer": response}
 
 
+@fast_app.post("/exclude_two_answers")
+async def exclude_two_answers(user_response: ExcludeTwoAnswersResponse):
+    quiz = get_quiz()
+
+    # Валидация данных
+    # Проверка верного названия блока
+    try:
+        level: list['Block'] = getattr(quiz, user_response.name_block)
+    except AttributeError:
+        return get_json_response("There is no block with this name")
+
+    # Проверка попадания в списки
+    if check_entry_in_list(user_response.number_question_in_block, level) is False:
+        return get_json_response("There is no such id in the block")
+
+    block = level[user_response.number_question_in_block]
+    right_answer_text = block.answers[block.right_answer]
+    answer_options = [0, 1, 2, 3]
+    # Удаляем правильный ответ
+    answer_options.remove(block.right_answer)
+    # Получаем не правильный ответ
+    wrong_answer = answer_options[random.randint(0, len(answer_options) - 1)]
+    return {"status": "success", "answer": {
+        "question": block.question,
+        "answers": [right_answer_text, wrong_answer],
+        "right_answer": 0
+    }}
+
+
 @fast_app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content=jsonable_encoder({"status": "error",
-                                  "answer": "Invalid data type"}),
-    )
+    return get_json_response("Invalid data type")

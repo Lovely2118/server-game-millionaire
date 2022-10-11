@@ -19,7 +19,7 @@ exclude_two_answers_without_parameters = {}
 
 exclude_two_answers_with_incorrect_question_number_in_block = {
     "user_id": "test_user_id",
-    "name_block": "level_45",
+    "name_block": "level_1",
     "number_question_in_block": -123
 }
 
