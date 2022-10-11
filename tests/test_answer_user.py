@@ -1,9 +1,6 @@
 import json
 
-import pytest
-from starlette.testclient import TestClient
-
-from app.commands import fast_app
+from tests.test_utils import setup  # type: ignore
 
 user_response_correct = {"user_id": "test_user_id",
                          "name_block": "level_1",
@@ -24,12 +21,6 @@ user_response_with_incorrect_type_answer_user = {"user_id": "test_user_id",
                                                  "name_block": "level_1",
                                                  "number_question_in_block": -14,
                                                  "answer_id": "answer_user"}
-
-
-@pytest.fixture(scope="function")
-def setup():
-    client = TestClient(fast_app)
-    return client
 
 
 def test_check_answer_user_with_correct_user_response(setup) -> None:
