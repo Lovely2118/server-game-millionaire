@@ -3,10 +3,7 @@ from pydantic import BaseModel
 
 class Block(BaseModel):
     question: str
-    answer_1: str
-    answer_2: str
-    answer_3: str
-    answer_4: str
+    answers: list['str']
     right_answer: int
 
 
