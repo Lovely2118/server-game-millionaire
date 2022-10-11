@@ -13,7 +13,6 @@ fast_app = FastAPI()
 
 @fast_app.post("/check_answer_user")
 async def check_answer_user(user_response: UserResponse):
-    print(f"My User response: {user_response}")
     quiz = get_quiz()
 
     # Валидация данных
