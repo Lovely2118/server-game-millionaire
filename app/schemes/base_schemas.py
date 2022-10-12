@@ -13,3 +13,11 @@ class Quiz(BaseModel):
     level_3: list['Block']
     level_4: list['Block']
     level_5: list['Block']
+
+
+class User(BaseModel):
+    id: str
+    name: str
+    money: int | float
+    number_block: int
+    number_question_in_block: int

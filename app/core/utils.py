@@ -6,7 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from starlette import status
 from starlette.responses import JSONResponse
 
-from app.schemes.quiz import Quiz
+from app.schemes.quiz import Quiz, User
 
 
 def get_project_root():
@@ -14,10 +14,36 @@ def get_project_root():
 
 
 def get_quiz() -> Quiz:
-    path_quiz = os.path.join(get_project_root(), "static\quiz.json")
+    """
+        Возвращает объект quiz созданный на основе данных из quiz.json
+    :return:
+    """
+    path_quiz = os.path.join(get_project_root(), r"static\quiz.json")
     with open(path_quiz, 'r', encoding="utf-8") as fr:
         data = json.loads(fr.read())
         return Quiz(**data)
+
+
+def get_users() -> list['User']:
+    """
+        Возвращает список пользователей из users.json
+    :return:
+    """
+    path_users = os.path.join(get_project_root(), r"static\users.json")
+    with open(path_users, 'r', encoding="utf-8") as fr:
+        data = json.loads(fr.read())
+        if len(data["users"]) > 0:
+            return []
+        return [User(**user) for user in data["users"]]
+
+
+def save_users(users: list['User']) -> None:
+    path_users = os.path.join(get_project_root(), r"static\users.json")
+    with open(path_users, 'r', encoding="utf-8") as fr:
+        convertor = {"users": []}
+        for user in users:
+            convertor["users"].append(user.dict())
+        json.dumps(convertor)
 
 
 def check_entry_in_list(index: int, selected_list: list) -> bool:
