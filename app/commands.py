@@ -4,13 +4,30 @@ from fastapi import FastAPI
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 
-from app.core.utils import get_quiz, get_json_response, check_entry_in_list, get_users
-from app.errors import UserIsNotInJson
-from app.handler_users import get_user_by_id
-from app.schemes.base_schemas import Block
-from app.schemes.request_schemas import CheckAnswerRequest, ExcludeTwoAnswersRequest, GetQuestionWithAnswersRequest
+from app.core.utils import get_quiz, get_json_response, check_entry_in_list, get_users, generate_random_string, \
+    generate_unique_user_id
+from app.errors import UserIsNotInJson, UserAlreadyExists
+from app.handler_users import get_user_by_id, add_user, go_to_next_question
+from app.schemes.base_schemas import Block, User
+from app.schemes.request_schemas import CheckAnswerRequest, ExcludeTwoAnswersRequest, GetQuestionWithAnswersRequest, \
+    RegisterUserRequest
 
 fast_app = FastAPI()
+
+
+@fast_app.post("/register_user")
+async def register_user(user_request: RegisterUserRequest):
+    users = get_users()
+
+    # Валидация данных
+    try:
+        unique_user_id = generate_unique_user_id()
+        new_user = User(user_id=unique_user_id, name=user_request.name, money=0, name_block="level_1", number_question_in_block=0)
+        add_user(new_user, users)
+    except UserAlreadyExists:
+        # todo поменять ошибку
+        return get_json_response("The user does not exist")
+    return {"status": "success", "answer": {"user_id": unique_user_id}}
 
 
 @fast_app.post("/get_question_with_answers")
@@ -57,7 +74,8 @@ async def check_answer_user(user_request: CheckAnswerRequest):
     # Проверяем верность ответа
     right_answer = block.right_answer
     response = right_answer == user_request.answer_id
-
+    if response:
+        go_to_next_question(selected_user, level)
     return {"status": "success", "answer": response}
 
 
