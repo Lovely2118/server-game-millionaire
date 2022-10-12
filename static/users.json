@@ -1,1 +1,39 @@
-{"users": [{"user_id": "test_user_id", "name": "test_name", "money": 0, "name_block": "level_1", "number_question_in_block": 0}, {"user_id": "raqjrojyqkwbpmjlqfyawuail", "name": "string", "money": 0, "name_block": "level_1", "number_question_in_block": 0}, {"user_id": "ebgvzyjvemzqbnokuvqonaquo", "name": "anton", "money": 0, "name_block": "level_1", "number_question_in_block": 0}, {"user_id": "akcewrcxkbhhcmvkorsfjrffr", "name": "anton", "money": 0, "name_block": "level_1", "number_question_in_block": 0}, {"user_id": "wzafckvbygcawruouwozphsuv", "name": "anton", "money": 0, "name_block": "level_1", "number_question_in_block": 1}]}
+{
+  "users": [
+    {
+      "user_id": "test_user_id",
+      "name": "test_name",
+      "money": 0,
+      "name_block": "level_1",
+      "number_question_in_block": 0
+    },
+    {
+      "user_id": "raqjrojyqkwbpmjlqfyawuail",
+      "name": "string",
+      "money": 0,
+      "name_block": "level_1",
+      "number_question_in_block": 0
+    },
+    {
+      "user_id": "ebgvzyjvemzqbnokuvqonaquo",
+      "name": "anton",
+      "money": 0,
+      "name_block": "level_1",
+      "number_question_in_block": 0
+    },
+    {
+      "user_id": "akcewrcxkbhhcmvkorsfjrffr",
+      "name": "anton",
+      "money": 0,
+      "name_block": "level_1",
+      "number_question_in_block": 0
+    },
+    {
+      "user_id": "wzafckvbygcawruouwozphsuv",
+      "name": "anton",
+      "money": 0,
+      "name_block": "level_1",
+      "number_question_in_block": 1
+    }
+  ]
+}

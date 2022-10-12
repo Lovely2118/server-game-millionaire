@@ -15,8 +15,21 @@ from app.schemes.request_schemas import CheckAnswerRequest, ExcludeTwoAnswersReq
 fast_app = FastAPI()
 
 
+@fast_app.get("/check_user_by_name")
+def check_user_by_name() -> None:
+    pass
+
+
+@fast_app.get("/get_money_user")
+def get_money_user() -> None:
+    pass
+
+
 @fast_app.post("/register_user")
 async def register_user(user_request: RegisterUserRequest):
+    """
+        Регистрация пользователя на сервере
+    """
     users = get_users()
 
     # Валидация данных
@@ -32,6 +45,9 @@ async def register_user(user_request: RegisterUserRequest):
 
 @fast_app.post("/get_question_with_answers")
 async def get_question_with_answers(user_request: GetQuestionWithAnswersRequest):
+    """
+        Получить вопрос и ответы для выбранного пользователя
+    """
     quiz = get_quiz()
     users = get_users()
 
@@ -52,6 +68,9 @@ async def get_question_with_answers(user_request: GetQuestionWithAnswersRequest)
 
 @fast_app.post("/check_answer_user")
 async def check_answer_user(user_request: CheckAnswerRequest):
+    """
+        Проверить вопрос пользователя на правильность
+    """
     quiz = get_quiz()
     users = get_users()
 
@@ -81,6 +100,9 @@ async def check_answer_user(user_request: CheckAnswerRequest):
 
 @fast_app.post("/exclude_two_answers")
 async def exclude_two_answers(user_request: ExcludeTwoAnswersRequest):
+    """
+        Удалить два неверных ответа
+    """
     quiz = get_quiz()
     users = get_users()
 

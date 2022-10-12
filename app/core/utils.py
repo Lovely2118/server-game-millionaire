@@ -4,6 +4,7 @@ import random
 import string
 from pathlib import Path
 
+from dotenv import load_dotenv
 from fastapi.encoders import jsonable_encoder
 from starlette import status
 from starlette.responses import JSONResponse
@@ -13,6 +14,28 @@ from app.schemes.base_schemas import Quiz, User
 
 def get_project_root():
     return Path(__file__).parent.parent.parent
+
+
+def get_env_path():
+    return os.path.join(get_project_root(), ".env")
+
+
+def load_env():
+    load_dotenv(get_env_path())
+
+
+load_env()
+
+
+def get_database_url():
+    url_string = "postgresql://{}:{}@{}:{}/{}".format(
+        os.environ.get("DATABASE-USER"),
+        os.environ.get("DATABASE-PASSWORD"),
+        os.environ.get("DATABASE-HOST"),
+        os.environ.get("DATABASE-PORT"),
+        os.environ.get("DATABASE-NAME")
+    )
+    return url_string
 
 
 def get_quiz() -> Quiz:
