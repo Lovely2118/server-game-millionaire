@@ -39,21 +39,23 @@ async def get_question_with_answers(user_request: GetQuestionWithAnswersRequest)
 @fast_app.post("/check_answer_user")
 async def check_answer_user(user_request: CheckAnswerRequest):
     quiz = get_quiz()
+    users = get_users()
 
     # Валидация данных
+    # Проверка существования пользователя
+    try:
+        selected_user = get_user_by_id(user_request.user_id, users)
+    except UserIsNotInJson:
+        return get_json_response("The user does not exist")
     # Проверка верного названия блока
     try:
-        level: list['Block'] = getattr(quiz, user_request.name_block)
+        level: list['Block'] = getattr(quiz, selected_user.name_block)
     except AttributeError:
         return get_json_response("There is no block with this name")
 
-    # Проверка попадания в списки
-    if check_entry_in_list(user_request.number_question_in_block, level) is False:
-        return get_json_response("There is no such id in the block")
-
     # Проверка корректности id ответа
     answer_id = user_request.answer_id
-    block = level[user_request.number_question_in_block]
+    block = level[selected_user.number_question_in_block]
     if check_entry_in_list(answer_id, block.answers) is False:
         return get_json_response("Invalid response number")
 
