@@ -39,7 +39,7 @@ def test_exclude_two_answers_with_correct_request(setup) -> None:
     response_exclude_two_answers = client.post("/exclude_two_answers",
                                                data=json.dumps(exclude_two_answers_correct_request))
 
-    # Тестирование результатов
+    # Проверка результатов
     assert response_exclude_two_answers.status_code == 200
     response_json = response_exclude_two_answers.json()
     answer = response_json["answer"]

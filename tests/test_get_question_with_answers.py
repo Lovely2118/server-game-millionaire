@@ -1,5 +1,7 @@
 import json
 
+from tests.test_utils import setup  # type: ignore
+
 get_question_with_answers_correct_request = {
     "user_id": "test_user_id"
 }

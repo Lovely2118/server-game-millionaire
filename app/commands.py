@@ -5,7 +5,7 @@ from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 
 from app.core.utils import get_quiz, get_json_response, check_entry_in_list
-from app.schemes.quiz import Block
+from app.schemes.base_schemas import Block
 from app.schemes.request_schemas import CheckAnswerRequest, ExcludeTwoAnswersRequest, GetQuestionWithAnswersRequest
 
 fast_app = FastAPI()
