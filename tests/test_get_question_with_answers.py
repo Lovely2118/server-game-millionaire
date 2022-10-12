@@ -33,8 +33,8 @@ def test_get_question_with_answers_correct_request(setup) -> None:
     response_json = response_get_question_with_answers.json()
     assert response_get_question_with_answers.status_code == 200
     assert response_json["status"] == "success"
-    assert "question" in response_json["answers"].keys()
-    assert "answers" in response_json["answers"].keys()
+    assert "question" in response_json["answer"].keys()
+    assert "answers" in response_json["answer"].keys()
 
 
 def test_get_question_with_answers_invalid_user_id(setup) -> None:
@@ -73,5 +73,5 @@ def test_get_question_with_answers_invalid_key_data_type(setup) -> None:
 
     # Проверка результатов
     assert response_get_question_with_answers.status_code == 422
-    assert response_get_question_with_answers.json() == {"status": "error", "answer": "Invalid data type"}
+    assert response_get_question_with_answers.json() == {"status": "error", "answer": "The user does not exist"}
 

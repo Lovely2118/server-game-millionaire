@@ -6,7 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from starlette import status
 from starlette.responses import JSONResponse
 
-from app.schemes.quiz import Quiz, User
+from app.schemes.base_schemas import Quiz, User
 
 
 def get_project_root():
@@ -32,7 +32,7 @@ def get_users() -> list['User']:
     path_users = os.path.join(get_project_root(), r"static\users.json")
     with open(path_users, 'r', encoding="utf-8") as fr:
         data = json.loads(fr.read())
-        if len(data["users"]) > 0:
+        if len(data["users"]) == 0:
             return []
         return [User(**user) for user in data["users"]]
 

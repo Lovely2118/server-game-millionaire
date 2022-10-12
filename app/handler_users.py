@@ -1,6 +1,6 @@
 from app.core.utils import get_users, save_users
-from app.errors import UserAlreadyExists, FailedToReplaceUser
-from app.schemes.quiz import User
+from app.errors import UserAlreadyExists, FailedToReplaceUser, UserIsNotInJson
+from app.schemes.base_schemas import User
 
 
 def add_user(user: User) -> None:
@@ -12,7 +12,7 @@ def add_user(user: User) -> None:
 
     users = get_users()
 
-    is_uniqueness = check_uniqueness(user, users)
+    is_uniqueness = check_uniqueness(user.user_id, users)
     if is_uniqueness:
         users.append(user)
         save_users(users)
@@ -29,17 +29,26 @@ def update_user(user: User) -> None:
 
     users = get_users()
 
-    is_uniqueness = check_uniqueness(user, users)
+    is_uniqueness = check_uniqueness(user.user_id, users)
     if is_uniqueness is False:
         replace_user(user, users)
         save_users(users)
         return
-    raise UserAlreadyExists()
+
+    raise UserIsNotInJson()
 
 
-def check_uniqueness(user: User, users: list['User']) -> bool:
+def get_user_by_id(user_id: str, users: list['User']) -> User:
     for user_from_bd in users:
-        if user_from_bd.id == user.id:
+        if user_from_bd.user_id == user_id:
+            return user_from_bd
+
+    raise UserIsNotInJson()
+
+
+def check_uniqueness(user_id: str, users: list['User']) -> bool:
+    for user_from_bd in users:
+        if user_from_bd.user_id == user_id:
             return False
     return True
 
@@ -48,7 +57,7 @@ def replace_user(user: User, users: list['User']) -> None:
     selected_index = -1
     for index in range(len(users)):
         user_from_bd = users[index]
-        if user_from_bd.id == user.id:
+        if user_from_bd.user_id == user.user_id:
             selected_index = index
             break
 

@@ -16,8 +16,8 @@ class Quiz(BaseModel):
 
 
 class User(BaseModel):
-    id: str
+    user_id: str
     name: str
     money: int | float
-    number_block: int
+    name_block: str
     number_question_in_block: int
