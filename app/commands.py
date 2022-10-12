@@ -4,7 +4,9 @@ from fastapi import FastAPI
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 
-from app.core.utils import get_quiz, get_json_response, check_entry_in_list
+from app.core.utils import get_quiz, get_json_response, check_entry_in_list, get_users
+from app.errors import UserIsNotInJson
+from app.handler_users import get_user_by_id
 from app.schemes.base_schemas import Block
 from app.schemes.request_schemas import CheckAnswerRequest, ExcludeTwoAnswersRequest, GetQuestionWithAnswersRequest
 
@@ -12,8 +14,26 @@ fast_app = FastAPI()
 
 
 @fast_app.post("/get_question_with_answers")
-async def get_question_with_answers(user_request: GetQuestionWithAnswersRequest) -> None:
-    pass
+async def get_question_with_answers(user_request: GetQuestionWithAnswersRequest):
+    quiz = get_quiz()
+    users = get_users()
+
+    # Валидация данных
+    # Проверка существования пользователя
+    try:
+        selected_user = get_user_by_id(user_request.user_id, users)
+    except UserIsNotInJson:
+        return get_json_response("The user does not exist")
+
+    # Проверка верного названия блока
+    try:
+        level: list['Block'] = getattr(quiz, selected_user.name_block)
+    except AttributeError:
+        return get_json_response("There is no block with this name")
+
+    block = level[selected_user.number_question_in_block]
+    return {"status": "success", "answer": {"question": block.question,
+                                            "answers": block.answers}}
 
 
 @fast_app.post("/check_answer_user")
