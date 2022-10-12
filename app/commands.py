@@ -19,15 +19,12 @@ async def get_question_with_answers(user_request: GetQuestionWithAnswersRequest)
     users = get_users()
 
     # Валидация данных
-    # Проверка существования пользователя
+    # Проверка существования пользователя и верного названия блока
     try:
         selected_user = get_user_by_id(user_request.user_id, users)
+        level: list['Block'] = getattr(quiz, selected_user.name_block)
     except UserIsNotInJson:
         return get_json_response("The user does not exist")
-
-    # Проверка верного названия блока
-    try:
-        level: list['Block'] = getattr(quiz, selected_user.name_block)
     except AttributeError:
         return get_json_response("There is no block with this name")
 
@@ -42,14 +39,12 @@ async def check_answer_user(user_request: CheckAnswerRequest):
     users = get_users()
 
     # Валидация данных
-    # Проверка существования пользователя
+    # Проверка существования пользователя и верного названия блока
     try:
         selected_user = get_user_by_id(user_request.user_id, users)
+        level: list['Block'] = getattr(quiz, selected_user.name_block)
     except UserIsNotInJson:
         return get_json_response("The user does not exist")
-    # Проверка верного названия блока
-    try:
-        level: list['Block'] = getattr(quiz, selected_user.name_block)
     except AttributeError:
         return get_json_response("There is no block with this name")
 
@@ -69,19 +64,19 @@ async def check_answer_user(user_request: CheckAnswerRequest):
 @fast_app.post("/exclude_two_answers")
 async def exclude_two_answers(user_request: ExcludeTwoAnswersRequest):
     quiz = get_quiz()
+    users = get_users()
 
     # Валидация данных
-    # Проверка верного названия блока
+    # Проверка существования пользователя и верного названия блока
     try:
-        level: list['Block'] = getattr(quiz, user_request.name_block)
+        selected_user = get_user_by_id(user_request.user_id, users)
+        level: list['Block'] = getattr(quiz, selected_user.name_block)
+    except UserIsNotInJson:
+        return get_json_response("The user does not exist")
     except AttributeError:
         return get_json_response("There is no block with this name")
 
-    # Проверка попадания в списки
-    if check_entry_in_list(user_request.number_question_in_block, level) is False:
-        return get_json_response("There is no such id in the block")
-
-    block = level[user_request.number_question_in_block]
+    block = level[selected_user.number_question_in_block]
     right_answer_text = block.answers[block.right_answer]
     answer_options = [0, 1, 2, 3]
     # Удаляем правильный ответ
