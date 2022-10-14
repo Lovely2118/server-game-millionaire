@@ -4,38 +4,57 @@ from fastapi import FastAPI
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 
-from app.core.utils import get_quiz, get_json_response, check_entry_in_list, get_users, generate_random_string, \
-    generate_unique_user_id
+from app.core.utils import get_quiz, get_json_response, check_entry_in_list, get_users, generate_unique_user_id
 from app.errors import UserIsNotInJson, UserAlreadyExists
 from app.handler_users import get_user_by_id, add_user, go_to_next_question
 from app.schemes.base_schemas import Block, User
 from app.schemes.request_schemas import CheckAnswerRequest, ExcludeTwoAnswersRequest, GetQuestionWithAnswersRequest, \
-    RegisterUserRequest
+    RegisterUserRequest, CheckUserByUserIdRequest, GetMoneyUserRequest
 
 fast_app = FastAPI()
 
 
-@fast_app.get("/check_user_by_name")
-def check_user_by_name() -> None:
-    pass
+@fast_app.post("/check_user_by_user_id")
+def check_user_by_user_id(user_request: CheckUserByUserIdRequest):
+    """
+        Возвращает true/false в зависимости от того есть такой пользователь в системе или нет
+        Для работы требуется user_id
+    :return:
+    """
+    # todo код ниже является примером выходных данных (в случае успешного запроса)
+    return {"status": "success", "answer": {
+        "user_found": True,  # Если пользователь в системе есть, иначе False
+        "user_id": "id пользователя",  # Думаю сделать чтобы пользователю не нужно будет регистрироваться,
+        # Если в запрос будет передано только имя, метод будет его регистрировать
+        "name": "Имя пользователя",  # Имя пользователя в игре
+        "money": "Кол-во монет пользователя"  # Кол-во монет которые есть у пользователя
+    }}
 
 
-@fast_app.get("/get_money_user")
-def get_money_user() -> None:
-    pass
+@fast_app.post("/get_money_user")
+def get_money_user(user_request: GetMoneyUserRequest):
+    """
+        Возвращает кол-во монет пользователя, если пользователь есть
+    :return:
+    """
+    # todo код ниже является примером выходных данных (в случае успешного запроса)
+    return {"status": "success", "answer": {
+        "money": 0  # кол-во монет пользователя
+    }}
 
 
 @fast_app.post("/register_user")
 async def register_user(user_request: RegisterUserRequest):
     """
-        Регистрация пользователя на сервере
+        Регистрация пользователя, если до этого его не было
     """
     users = get_users()
 
     # Валидация данных
     try:
         unique_user_id = generate_unique_user_id()
-        new_user = User(user_id=unique_user_id, name=user_request.name, money=0, name_block="level_1", number_question_in_block=0)
+        new_user = User(user_id=unique_user_id, name=user_request.name, money=0, name_block="level_1",
+                        number_question_in_block=0)
         add_user(new_user, users)
     except UserAlreadyExists:
         # todo поменять ошибку
@@ -47,6 +66,7 @@ async def register_user(user_request: RegisterUserRequest):
 async def get_question_with_answers(user_request: GetQuestionWithAnswersRequest):
     """
         Получить вопрос и ответы для выбранного пользователя
+        Так же возвращает информацию о том является бло последним для ответа
     """
     quiz = get_quiz()
     users = get_users()
@@ -69,7 +89,8 @@ async def get_question_with_answers(user_request: GetQuestionWithAnswersRequest)
 @fast_app.post("/check_answer_user")
 async def check_answer_user(user_request: CheckAnswerRequest):
     """
-        Проверить вопрос пользователя на правильность
+        Проверить ответ пользователя на правильность
+        Если ответ правильный, сервер сам переключит вопрос и ответы на следующий
     """
     quiz = get_quiz()
     users = get_users()
@@ -101,7 +122,7 @@ async def check_answer_user(user_request: CheckAnswerRequest):
 @fast_app.post("/exclude_two_answers")
 async def exclude_two_answers(user_request: ExcludeTwoAnswersRequest):
     """
-        Удалить два неверных ответа
+        Вырезает два неверных ответа у пользователя
     """
     quiz = get_quiz()
     users = get_users()

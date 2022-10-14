@@ -8,6 +8,14 @@ class BaseWithUserIdRequest(BaseModel):
     user_id: str
 
 
+class CheckUserByUserIdRequest(BaseWithUserIdRequest):
+    pass
+
+
+class GetMoneyUserRequest(BaseWithUserIdRequest):
+    pass
+
+
 class RegisterUserRequest(BaseModel):
     name: str | None
 
