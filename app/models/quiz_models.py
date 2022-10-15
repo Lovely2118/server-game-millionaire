@@ -10,13 +10,17 @@ class BlockModel(BaseModel):
     question = Column(String, nullable=False)
     answers = relationship("AnswerModel")
     right_answer = Column(Integer, nullable=False)
+    cost = Column(Integer, nullable=False)
+    level = relationship("LevelModel", uselist=False)
+
+    user_id = Column(Integer, ForeignKey("users.id"))
 
 
 class AnswerModel(BaseModel):
     __tablename__ = "answers"
 
     answer = Column(String, nullable=False, unique=True)
-    level_model_id = Column(Integer, ForeignKey("blocks.id"))
+    block_id = Column(Integer, ForeignKey("blocks.id"))
 
 
 class UserModel(BaseModel):
@@ -25,4 +29,11 @@ class UserModel(BaseModel):
     user_id = Column(String, nullable=False, unique=True)
     name = Column(String, nullable=False, unique=True)
     money = Column(Float, nullable=True, default=0)
-    selected_block = relationship("BlockModel", uselist=False)
+    block = relationship("BlockModel", uselist=False)
+
+
+class LevelModel(BaseModel):
+    __tablename__ = "levels"
+
+    level = Column(Integer, nullable=False, unique=True)
+    block_id = Column(Integer, ForeignKey("blocks.id"))

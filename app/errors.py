@@ -2,7 +2,7 @@ class HandlerUsersException(Exception):
     pass
 
 
-class UserIsNotInJson(HandlerUsersException):
+class UserIsNotInDatabase(HandlerUsersException):
     pass
 
 
