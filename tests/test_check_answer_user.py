@@ -1,6 +1,6 @@
 import json
 
-from tests.test_utils import setup  # type: ignore
+from tests.test_utils import setup, teardown  # type: ignore
 
 user_response_correct = {"user_id": "test_user_id",
                          "answer_id": 1}
@@ -18,7 +18,7 @@ def test_check_answer_user_with_correct_user_response(setup) -> None:
 
     # Подготовка данных
     global user_response_correct
-    client = setup
+    client, user_id = setup["fast_api_client"], setup["user_id"]
 
     # Вызов тестируемой функции
     response_check_answer_user = client.post("/check_answer_user", data=json.dumps(user_response_correct))
@@ -37,7 +37,7 @@ def test_check_answer_user_with_incorrect_type_answer_user(setup) -> None:
 
     # Подготовка данных
     global user_response_with_incorrect_type_answer_user
-    client = setup
+    client, user_id = setup["fast_api_client"], setup["user_id"]
 
     # Вызов тестируемой функции
     response_check_answer_user = client.post("/check_answer_user",

@@ -1,6 +1,6 @@
 import json
 
-from tests.test_utils import setup  # type: ignore
+from tests.test_utils import setup, teardown  # type: ignore
 
 exclude_two_answers_correct_request = {
     "user_id": "test_user_id",
@@ -18,7 +18,7 @@ def test_exclude_two_answers_with_correct_request(setup) -> None:
 
     # Подготовка данных
     global exclude_two_answers_correct_request
-    client = setup
+    client, user_id = setup["fast_api_client"], setup["user_id"]
 
     # Тестирование требуемой функции
     response_exclude_two_answers = client.post("/exclude_two_answers",
@@ -45,7 +45,7 @@ def test_exclude_two_answers_without_parameters(setup) -> None:
 
     # Подготовка данных
     global exclude_two_answers_without_parameters
-    client = setup
+    client, user_id = setup["fast_api_client"], setup["user_id"]
 
     # Тестирование требуемой функции
     response_exclude_two_answers = client.post("/exclude_two_answers",

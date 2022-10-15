@@ -1,6 +1,6 @@
 import json
 
-from tests.test_utils import setup  # type: ignore
+from tests.test_utils import setup, teardown  # type: ignore
 
 get_question_with_answers_correct_request = {
     "user_id": "test_user_id"
@@ -23,7 +23,7 @@ def test_get_question_with_answers_correct_request(setup) -> None:
     """
     # Подготовка данных
     global get_question_with_answers_correct_request
-    client = setup
+    client, user_id = setup["fast_api_client"], setup["user_id"]
 
     # Тестирование требуемой функции
     response_get_question_with_answers = client.post("/get_question_with_answers",
@@ -45,7 +45,7 @@ def test_get_question_with_answers_invalid_user_id(setup) -> None:
     """
     # Подготовка данных
     global get_question_with_answers_invalid_user_id
-    client = setup
+    client, user_id = setup["fast_api_client"], setup["user_id"]
 
     # Тестирование требуемой функции
     response_get_question_with_answers = client.post("/get_question_with_answers",
@@ -65,7 +65,7 @@ def test_get_question_with_answers_invalid_key_data_type(setup) -> None:
 
     # Подготовка данных
     global get_question_with_answers_invalid_key_data_type
-    client = setup
+    client, user_id = setup["fast_api_client"], setup["user_id"]
 
     # Тестирование требуемой функции
     response_get_question_with_answers = client.post("/get_question_with_answers",

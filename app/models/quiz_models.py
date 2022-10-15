@@ -8,10 +8,10 @@ class BlockModel(BaseModel):
     __tablename__ = "blocks"
 
     question = Column(String, nullable=False)
-    answers = relationship("AnswerModel")
+    answers = relationship("AnswerModel", lazy='joined')
     right_answer = Column(Integer, nullable=False)
     cost = Column(Integer, nullable=False)
-    level = relationship("LevelModel", uselist=False)
+    level = relationship("LevelModel", uselist=False, lazy='joined')
 
     user_id = Column(Integer, ForeignKey("users.id"))
 
@@ -29,7 +29,7 @@ class UserModel(BaseModel):
     user_id = Column(String, nullable=False, unique=True)
     name = Column(String, nullable=False, unique=True)
     money = Column(Float, nullable=True, default=0)
-    block = relationship("BlockModel", uselist=False)
+    block = relationship("BlockModel", uselist=False, lazy="joined")
 
 
 class LevelModel(BaseModel):

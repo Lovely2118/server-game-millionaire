@@ -7,7 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from app.core.database_utils import generate_unique_user_id, get_user_by_user_id
 from app.core.utils import get_json_response, check_entry_in_list
 from app.errors import UserIsNotInDatabase, UserAlreadyExists
-from app.models.quiz_models import BlockModel
+from app.models.quiz_models import BlockModel, AnswerModel
 from app.schemes.base_schemas import Block, User
 from app.schemes.request_schemas import CheckAnswerRequest, ExcludeTwoAnswersRequest, GetQuestionWithAnswersRequest, \
     RegisterUserRequest, CheckUserByUserIdRequest, GetMoneyUserRequest
@@ -128,17 +128,17 @@ async def exclude_two_answers(user_request: ExcludeTwoAnswersRequest):
     try:
         selected_user = get_user_by_user_id(user_request.user_id)
         block: BlockModel = selected_user.block
+        answers: list['AnswerModel'] = block.answers[::-1]
     except UserIsNotInDatabase:
         return get_json_response("The user does not exist")
     except AttributeError:
         return get_json_response("There is no block with this name")
-
-    right_answer_text = block.answers[block.right_answer]
+    right_answer_text = answers[block.right_answer].answer
     answer_options = [0, 1, 2, 3]
     # Удаляем правильный ответ
     answer_options.remove(block.right_answer)
     # Получаем не правильный ответ
-    wrong_answer = block.answers[random.randint(0, len(answer_options) - 1)]
+    wrong_answer = block.answers[random.randint(0, len(answer_options) - 1)].answer
     return {"status": "success", "answer": {
         "question": block.question,
         "answers": [right_answer_text, wrong_answer],
