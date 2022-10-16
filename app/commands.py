@@ -4,30 +4,50 @@ from fastapi import FastAPI
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 
-from app.core.database_utils import generate_unique_user_id, get_user_by_user_id
+from app.core.database_utils import get_user_by_user_id, register_user
 from app.core.utils import get_json_response, check_entry_in_list
-from app.errors import UserIsNotInDatabase, UserAlreadyExists
+from app.errors import UserIsNotInDatabase, MyException
 from app.models.quiz_models import BlockModel, AnswerModel
-from app.schemes.base_schemas import Block, User
 from app.schemes.request_schemas import CheckAnswerRequest, ExcludeTwoAnswersRequest, GetQuestionWithAnswersRequest, \
-    RegisterUserRequest, CheckUserByUserIdRequest, GetMoneyUserRequest
+    CheckUserByUserIdRequest, GetMoneyUserRequest
 
 fast_app = FastAPI()
 
 
 @fast_app.post("/get_user")
-def get_user_by_user_id(user_request: CheckUserByUserIdRequest):
+def get_user(user_request: CheckUserByUserIdRequest):
     """
         Возвращает true/false в зависимости от того есть такой пользователь в системе или нет
+        Также возвращает доп. информацию о пользователе
         Для работы требуется user_id
     :return:
     """
+    # Валидация данных
+    if user_request.user_id is not None:
+        # Пытаемся получить пользователя по user_id
+        try:
+            selected_user = get_user_by_user_id(user_request.user_id)
+            user_found = True
+        except UserIsNotInDatabase:
+            return get_json_response("The user does not exist")
+
+    elif user_request.name_user is not None:
+        # Пытаемся зарегистрировать пользователя
+        try:
+            selected_user = register_user(user_request.name_user)
+            user_found = False
+        except MyException as e:
+            return get_json_response(str(e))
+
+    else:
+        # В случае если не передан user_id и name_user
+        return get_json_response("Invalid data type")
+
     return {"status": "success", "answer": {
-        "user_found": True,  # Если пользователь в системе есть, иначе False
-        "user_id": "id пользователя",  # Думаю сделать чтобы пользователю не нужно будет регистрироваться,
-        # Если в запрос будет передано только имя, метод будет его регистрировать
-        "name": "Имя пользователя",  # Имя пользователя в игре
-        "money": "Кол-во монет пользователя"  # Кол-во монет которые есть у пользователя
+        "user_found": user_found,
+        "user_id": selected_user.user_id,
+        "name": selected_user.name,
+        "money": selected_user.money
     }}
 
 

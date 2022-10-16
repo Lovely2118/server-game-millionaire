@@ -1,14 +1,22 @@
-class HandlerUsersException(Exception):
+class MyException(Exception):
     pass
 
 
-class UserIsNotInDatabase(HandlerUsersException):
+class UserIsNotInDatabase(MyException):
     pass
 
 
-class UserAlreadyExists(HandlerUsersException):
+class UserAlreadyExists(MyException):
     pass
 
 
-class FailedToReplaceUser(HandlerUsersException):
+class FailedToReplaceUser(MyException):
+    pass
+
+
+class LevelModelDoesNotExist(MyException):
+    pass
+
+
+class BlockModelDoesNotExist(MyException):
     pass
