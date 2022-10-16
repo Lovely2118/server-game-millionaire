@@ -9,13 +9,13 @@ from app.core.utils import get_json_response, check_entry_in_list
 from app.errors import UserIsNotInDatabase, MyException
 from app.models.quiz_models import BlockModel, AnswerModel
 from app.schemes.request_schemas import CheckAnswerRequest, ExcludeTwoAnswersRequest, GetQuestionWithAnswersRequest, \
-    CheckUserByUserIdRequest, GetMoneyUserRequest
+    GetUserRequest
 
 fast_app = FastAPI()
 
 
-@fast_app.post("/get_user")
-def get_user(user_request: CheckUserByUserIdRequest):
+@fast_app.post("/get_data_about_user")
+def get_data_about_user(user_request: GetUserRequest):
     """
         Возвращает true/false в зависимости от того есть такой пользователь в системе или нет
         Также возвращает доп. информацию о пользователе
@@ -49,17 +49,6 @@ def get_user(user_request: CheckUserByUserIdRequest):
         "user_id": selected_user.user_id,
         "name": selected_user.name,
         "money": selected_user.money
-    }}
-
-
-@fast_app.post("/get_money_user")
-def get_money_user(user_request: GetMoneyUserRequest):
-    """
-        Возвращает кол-во монет пользователя, если пользователь есть
-    :return:
-    """
-    return {"status": "success", "answer": {
-        "money": 0  # кол-во монет пользователя
     }}
 
 
