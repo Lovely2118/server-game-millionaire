@@ -25,7 +25,8 @@ def test_check_answer_user_with_correct_user_response(setup) -> None:
 
     # Тестирование результатов
     assert response_check_answer_user.status_code == 200
-    assert response_check_answer_user.json() == {"status": "success", "answer": True}
+    assert response_check_answer_user.json() == {"status": "success",
+                                                 "answer": {"correct_answer": True, "last_block": False}}
 
 
 def test_check_answer_user_with_incorrect_type_answer_user(setup) -> None:

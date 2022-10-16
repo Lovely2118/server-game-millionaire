@@ -68,7 +68,7 @@ async def get_question_with_answers(user_request: GetQuestionWithAnswersRequest)
         return get_json_response("The user does not exist")
 
     return {"status": "success", "answer": {"question": block.question,
-                                            "answers": block.answers}}
+                                            "answers": [answer.answer for answer in block.answers]}}
 
 
 @fast_app.post("/check_answer_user")
@@ -94,7 +94,12 @@ async def check_answer_user(user_request: CheckAnswerRequest):
     # Проверяем верность ответа
     right_answer = block.right_answer
     response = right_answer == user_request.answer_id
-    return {"status": "success", "answer": response}
+    last_block = False
+    if response:
+        last_block = db_manager.next_block(selected_user)
+    else:
+        db_manager.reset_block(selected_user)
+    return {"status": "success", "answer": {"correct_answer": response, "last_block": last_block}}
 
 
 @fast_app.post("/exclude_two_answers")

@@ -23,8 +23,9 @@ class DatabaseManager:
         with SessionLocal() as session:
             user_id = "test_user_id"
             all_blocks: list['BlockModel'] = session.query(BlockModel).all()
-            selected_block = [block for block in all_blocks if
-                              block.question == "Как называют погоду, когда температура опускается гораздо ниже нуля?"]
+            selected_block = [block for block in all_blocks
+                              if block.question == "Как называют погоду, когда температура опускается гораздо ниже нуля?" or
+                              block.question == "Кем была девочка, которая несла бабушке пирожки в сказке «Красная шапочка»?"]
 
             new_user = UserModel(
                 user_id=user_id,
@@ -46,6 +47,8 @@ class DatabaseManager:
                 number_block=0,
                 blocks=blocks
             )
+            session.add(new_user)
+            session.commit()
             return new_user
 
     def check_user_by_user_id(self, user_id: str) -> bool:
@@ -67,6 +70,26 @@ class DatabaseManager:
 
                 if duplicate_found is False:
                     return user_id
+
+    @staticmethod
+    def next_block(user: UserModel) -> bool:
+        with SessionLocal() as session:
+            max_blocks = len(user.blocks)
+            current_block = user.number_block
+
+            if current_block + 1 < max_blocks:
+                user.number_block += 1
+                session.add(user)
+                session.commit()
+                return False
+            return True
+
+    def reset_block(self, user: UserModel) -> None:
+        with SessionLocal() as session:
+            user.number_block = 0
+            user.blocks = self.__get_blocks_of_one_game(session)
+            session.add(user)
+            session.commit()
 
     @staticmethod
     def __get_user_by_user_id(session: Session, user_id: str) -> UserModel | None:
