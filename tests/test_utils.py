@@ -3,19 +3,19 @@ from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
 from app.commands import fast_app
-from app.core.database_utils import __get_blocks_of_one_game
+from app.core.databasemanager import DatabaseManager
 from app.database.session import SessionLocal
-from app.models.quiz_models import UserModel, BlockModel
+from app.models.quiz_models import UserModel
 
 
 @pytest.fixture(scope="function")
 def setup():
     client = TestClient(fast_app)
     with SessionLocal() as session:
-        blocks = __get_blocks_of_one_game(session)
+        db = DatabaseManager()
         test_user = get_test_user(session)
         if test_user is None:
-            test_user = UserModel(user_id="test_user_id", name="test_name", money=100, blocks=blocks, number_block=0)
+            test_user = db.register_test_user("test_name", 100, 0)
             session.add(test_user)
             session.commit()
     return {

@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 
-from app.core.database_utils import get_user_by_user_id, register_user
+from app.core.databasemanager import DatabaseManager
 from app.core.utils import get_json_response, check_entry_in_list
 from app.errors import UserIsNotInDatabase, MyException
 from app.models.quiz_models import BlockModel, AnswerModel
@@ -23,10 +23,11 @@ def get_user(user_request: CheckUserByUserIdRequest):
     :return:
     """
     # Валидация данных
+    db_manager = DatabaseManager()
     if user_request.user_id is not None:
         # Пытаемся получить пользователя по user_id
         try:
-            selected_user = get_user_by_user_id(user_request.user_id)
+            selected_user = db_manager.get_user_by_user_id(user_request.user_id)
             user_found = True
         except UserIsNotInDatabase:
             return get_json_response("The user does not exist")
@@ -34,7 +35,7 @@ def get_user(user_request: CheckUserByUserIdRequest):
     elif user_request.name_user is not None:
         # Пытаемся зарегистрировать пользователя
         try:
-            selected_user = register_user(user_request.name_user)
+            selected_user = db_manager.register_user(user_request.name_user)
             user_found = False
         except MyException as e:
             return get_json_response(str(e))
@@ -62,25 +63,6 @@ def get_money_user(user_request: GetMoneyUserRequest):
     }}
 
 
-# @fast_app.post("/register_user")
-# async def register_user(user_request: RegisterUserRequest):
-#     """
-#         Регистрация пользователя, если до этого его не было
-#     """
-#     # users = get_users()
-#
-#     # Валидация данных
-#     try:
-#         unique_user_id = generate_unique_user_id()
-#         new_user = User(user_id=unique_user_id, name=user_request.name, money=0, name_block="level_1",
-#                         number_question_in_block=0)
-#         add_user(new_user, users)
-#     except UserAlreadyExists:
-#         # todo поменять ошибку
-#         return get_json_response("The user does not exist")
-#     return {"status": "success", "answer": {"user_id": unique_user_id}}
-
-
 @fast_app.post("/get_question_with_answers")
 async def get_question_with_answers(user_request: GetQuestionWithAnswersRequest):
     """
@@ -88,14 +70,13 @@ async def get_question_with_answers(user_request: GetQuestionWithAnswersRequest)
         Так же возвращает информацию о том является бло последним для ответа
     """
     # Валидация данных
-    # Проверка существования пользователя и верного названия блока
+    db_manager = DatabaseManager()
     try:
-        selected_user = get_user_by_user_id(user_request.user_id)
-        block: BlockModel = selected_user.block
+        # Проверка существования пользователя и верного названия блока
+        selected_user = db_manager.get_user_by_user_id(user_request.user_id)
+        block: BlockModel = selected_user.blocks[selected_user.number_block]
     except UserIsNotInDatabase:
         return get_json_response("The user does not exist")
-    except AttributeError:
-        return get_json_response("There is no block with this name")
 
     return {"status": "success", "answer": {"question": block.question,
                                             "answers": block.answers}}
@@ -107,18 +88,14 @@ async def check_answer_user(user_request: CheckAnswerRequest):
         Проверить ответ пользователя на правильность
         Если ответ правильный, сервер сам переключит вопрос и ответы на следующий
     """
-    # quiz = get_quiz()
-    # users = get_users()
-
     # Валидация данных
-    # Проверка существования пользователя и верного названия блока
+    db_manager = DatabaseManager()
     try:
-        selected_user = get_user_by_user_id(user_request.user_id)
-        block: BlockModel = selected_user.block
+        # Проверка существования пользователя и верного названия блока
+        selected_user = db_manager.get_user_by_user_id(user_request.user_id)
+        block: BlockModel = selected_user.blocks[selected_user.number_block]
     except UserIsNotInDatabase:
         return get_json_response("The user does not exist")
-    except AttributeError:
-        return get_json_response("There is no block with this name")
 
     # Проверка корректности id ответа
     answer_id = user_request.answer_id
@@ -128,8 +105,6 @@ async def check_answer_user(user_request: CheckAnswerRequest):
     # Проверяем верность ответа
     right_answer = block.right_answer
     response = right_answer == user_request.answer_id
-    # if response:
-    #     go_to_next_question(selected_user, level)
     return {"status": "success", "answer": response}
 
 
@@ -138,15 +113,13 @@ async def exclude_two_answers(user_request: ExcludeTwoAnswersRequest):
     """
         Вырезает два неверных ответа у пользователя
     """
-    # quiz = get_quiz()
-    # users = get_users()
-
     # Валидация данных
-    # Проверка существования пользователя и верного названия блока
+    db_manager = DatabaseManager()
     try:
-        selected_user = get_user_by_user_id(user_request.user_id)
-        block: BlockModel = selected_user.block
-        answers: list['AnswerModel'] = block.answers[::-1]
+        # Проверка существования пользователя и верного названия блока
+        selected_user = db_manager.get_user_by_user_id(user_request.user_id)
+        block: BlockModel = selected_user.blocks[selected_user.number_block]
+        answers: list['AnswerModel'] = block.answers
     except UserIsNotInDatabase:
         return get_json_response("The user does not exist")
     except AttributeError:
