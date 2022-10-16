@@ -14,7 +14,7 @@ def setup():
         block = session.query(BlockModel).filter(BlockModel.id == 1).first()
         test_user = get_test_user(session)
         if test_user is None:
-            test_user = UserModel(user_id="test_user_id", name="test_name", money=0, block=block)
+            test_user = UserModel(user_id="test_user_id", name="test_name", money=100, block=block)
             session.add(test_user)
             session.commit()
     return {

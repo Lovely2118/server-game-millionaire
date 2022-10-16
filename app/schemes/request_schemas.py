@@ -9,7 +9,8 @@ class BaseWithUserIdRequest(BaseModel):
 
 
 class CheckUserByUserIdRequest(BaseWithUserIdRequest):
-    pass
+    user_id: str | None
+    name_user: str | None
 
 
 class GetMoneyUserRequest(BaseWithUserIdRequest):

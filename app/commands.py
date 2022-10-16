@@ -15,14 +15,13 @@ from app.schemes.request_schemas import CheckAnswerRequest, ExcludeTwoAnswersReq
 fast_app = FastAPI()
 
 
-@fast_app.post("/check_user_by_user_id")
-def check_user_by_user_id(user_request: CheckUserByUserIdRequest):
+@fast_app.post("/get_user")
+def get_user_by_user_id(user_request: CheckUserByUserIdRequest):
     """
         Возвращает true/false в зависимости от того есть такой пользователь в системе или нет
         Для работы требуется user_id
     :return:
     """
-    # todo код ниже является примером выходных данных (в случае успешного запроса)
     return {"status": "success", "answer": {
         "user_found": True,  # Если пользователь в системе есть, иначе False
         "user_id": "id пользователя",  # Думаю сделать чтобы пользователю не нужно будет регистрироваться,
@@ -38,7 +37,6 @@ def get_money_user(user_request: GetMoneyUserRequest):
         Возвращает кол-во монет пользователя, если пользователь есть
     :return:
     """
-    # todo код ниже является примером выходных данных (в случае успешного запроса)
     return {"status": "success", "answer": {
         "money": 0  # кол-во монет пользователя
     }}
